@@ -4,9 +4,12 @@
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_BumpMap ("Normal Map", 2D) = "bump" {}
 		_MetallicTex ("Metallic (RGA, Metallic, Smoothness, Ambient Occlusion)", 2D) = "bump" {}
-		_Scale ("Scale", Float) = 1
 
-		[Header(Wind)]
+		[Header(Grass Settings)]
+		_GrassSize ("Grass Size", Float) = 1
+		_GrassCurve ("Grass Curve", Float) = 0.5
+
+		[Header(Wind Settings)]
 		_WindTex ("Wind Texture", 2D) = "white" {}
 		_WindSize ("Wind Size", Float) = 1
 		_WindSpeed ("Wind Speed", Float) = 1
@@ -28,7 +31,8 @@
         sampler2D _MainTex;
 		sampler2D _BumpMap;
 		sampler2D _MetallicTex;
-		half _Scale;
+		half _GrassSize;
+		half _GrassCurve;
 		sampler2D _WindTex;
 		half _WindSize;
 		half _WindSpeed;
@@ -54,7 +58,7 @@
         {
 			#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
             float4 data = positionBuffer[unity_InstanceID];
-			float scale = data.w * _Scale;
+			float scale = data.w * _GrassSize;
 
             unity_ObjectToWorld._11_21_31_41 = float4(scale, 0, 0, 0);
             unity_ObjectToWorld._12_22_32_42 = float4(0, scale, 0, 0);
@@ -80,7 +84,7 @@
 
 			float windStrength = GetWindStrength(data.xz, v.vertex.y);
             v.vertex.x += windStrength;   
-            v.vertex.y += sin(windStrength * 0.4);
+            v.vertex.y += windStrength * _GrassCurve;
 			#endif
 		}
 
