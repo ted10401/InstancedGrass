@@ -14,6 +14,10 @@
 		_WindSize ("Wind Size", Float) = 1
 		_WindSpeed ("Wind Speed", Float) = 1
 		_WindStrength ("Wind Strength", Float) = 1
+
+		[Header(Stamp)]
+		_StampRadius ("Stamp Radius", Float) = 1
+		_StampStrength ("Stamp Strength", Float) = 1
     }
     SubShader {
         Tags { "RenderType"="Opaque" }
@@ -37,10 +41,15 @@
 		half _WindSize;
 		half _WindSpeed;
 		half _WindStrength;
+		half _StampRadius;
+		half _StampStrength;
+
+		float3 _CharacterPosition;
 
         struct Input {
             float2 uv_MainTex;
 			float2 uv_BumpMap;
+			float3 worldPos;
         };
 
 		#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
@@ -82,22 +91,32 @@
             #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
             float4 data = positionBuffer[unity_InstanceID];
 
+			float3 worldPos = data.xyz;
+			float dist = distance(_CharacterPosition, worldPos);
+			float3 stampStrength = 1 - saturate(dist / _StampRadius);
+			float3 stampDir = worldPos - _CharacterPosition;
+			stampDir = normalize(stampDir) * stampStrength * _StampStrength * v.vertex.y;
+			v.vertex.xz += stampDir.xz;
+
 			float windStrength = GetWindStrength(data.xz, v.vertex.y);
+			//windStrength *= 1 - stampStrength;
             v.vertex.x += windStrength;   
             v.vertex.y += windStrength * _GrassCurve;
+
 			#endif
 		}
 
         void surf (Input IN, inout SurfaceOutputStandard o) {
             fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
-			fixed4 metallicCol = tex2D(_MetallicTex, IN.uv_MainTex);
+			clip(c.a - 0.1);
 
             o.Albedo = c.rgb;
 			o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
+
+			fixed4 metallicCol = tex2D(_MetallicTex, IN.uv_MainTex);
             o.Metallic = metallicCol.r;
             o.Smoothness = metallicCol.g;
             o.Alpha = c.a;
-			clip(c.a - 0.1);
         }
         ENDCG
     }

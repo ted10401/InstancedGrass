@@ -82,6 +82,8 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _StampRadius: 1.5
+    - _StampStrength: 1
     - _UVSec: 0
     - _WindSize: 10
     - _WindSpeed: 2
