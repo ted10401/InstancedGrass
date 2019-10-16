@@ -71,9 +71,9 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0
     - _GlossyReflections: 1
-    - _GrassCurve: 0.8
+    - _GrassCurve: 0
     - _GrassMaxHeight: 11.5
-    - _GrassSize: 35
+    - _GrassSize: 40
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1

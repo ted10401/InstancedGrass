@@ -4,6 +4,9 @@
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_BumpMap ("Normal Map", 2D) = "bump" {}
 		_MetallicTex ("Metallic (RGA, Metallic, Smoothness, Ambient Occlusion)", 2D) = "bump" {}
+		_Metallic ("Metallic", Range(0, 1)) = 1
+		_Smoothness ("Smoothness", Range(0, 1)) = 1
+		_Occlusion ("Occlusion", Range(0, 1)) = 1
 
 		[Header(Grass Settings)]
 		_GrassSize ("Grass Size", Float) = 1
@@ -35,6 +38,9 @@
         sampler2D _MainTex;
 		sampler2D _BumpMap;
 		sampler2D _MetallicTex;
+		half _Metallic;
+		half _Smoothness;
+		half _Occlusion;
 		half _GrassSize;
 		half _GrassCurve;
 		sampler2D _WindTex;
@@ -46,7 +52,8 @@
 
 		float3 _CharacterPosition;
 
-        struct Input {
+        struct Input
+		{
             float2 uv_MainTex;
 			float2 uv_BumpMap;
 			float3 worldPos;
@@ -99,24 +106,26 @@
 			v.vertex.xz += stampDir.xz;
 
 			float windStrength = GetWindStrength(data.xz, v.vertex.y);
-			//windStrength *= 1 - stampStrength;
             v.vertex.x += windStrength;   
             v.vertex.y += windStrength * _GrassCurve;
 
 			#endif
 		}
 
-        void surf (Input IN, inout SurfaceOutputStandard o) {
+        void surf (Input IN, inout SurfaceOutputStandard o)
+		{
             fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
-			clip(c.a - 0.1);
 
             o.Albedo = c.rgb;
 			o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
 
 			fixed4 metallicCol = tex2D(_MetallicTex, IN.uv_MainTex);
-            o.Metallic = metallicCol.r;
-            o.Smoothness = metallicCol.g;
+            o.Metallic = metallicCol.r * _Metallic;
+            o.Smoothness = metallicCol.g * _Smoothness;
+			o.Occlusion = metallicCol.a * _Occlusion;
             o.Alpha = c.a;
+
+			clip(c.a - 0.1);
         }
         ENDCG
     }
