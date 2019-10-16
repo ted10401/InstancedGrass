@@ -71,6 +71,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0
     - _GlossyReflections: 1
+    - _GrassColorThreshold: 0.25
     - _GrassCurve: 1
     - _GrassMaxHeight: 11.5
     - _GrassSize: 30

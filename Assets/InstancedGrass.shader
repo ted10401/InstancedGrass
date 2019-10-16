@@ -11,6 +11,7 @@
 		[Header(Grass Settings)]
 		_GrassSize ("Grass Size", Float) = 1
 		_GrassCurve ("Grass Curve", Float) = 0.5
+		_GrassColorThreshold ("Grass Color Threshold", Range(0, 1)) = 0
 
 		[Header(Wind Settings)]
 		_WindTex ("Wind Texture", 2D) = "white" {}
@@ -42,6 +43,7 @@
 		half _Occlusion;
 		half _GrassSize;
 		half _GrassCurve;
+		half _GrassColorThreshold;
 		sampler2D _WindTex;
 		half _WindSize;
 		half _WindSpeed;
@@ -55,7 +57,7 @@
 		{
             float2 uv_MainTex;
 			float2 uv_BumpMap;
-			float3 worldPos;
+			float variant;
         };
 
 		#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
@@ -78,6 +80,12 @@
 			#endif
         }
 
+		float3 hash(float3 p)
+		{
+			p = float3(dot(p, float3(127.1, 311.7,4560.0)), dot(p, float3(269.5, 183.3,143.15)), dot(p, float3(567.5,613.3,430.4)));
+			return  2.0 * frac(sin(p)*43758.5453123) - 1.0;
+		}
+
 		void rotate2D(inout float2 v, float r)
 		{
 			float s, c;
@@ -87,8 +95,7 @@
 
 		void rotateRandom(inout appdata_full v, float4 position)
 		{
-			float rotation = position.x + position.y * 10 + position.z * 100 + position.w * 1000;
-			rotate2D(v.vertex.xz, rotation);
+			rotate2D(v.vertex.xz, hash(position));
 		}
 
 		void updateStamp(inout appdata_full v, float4 position)
@@ -116,6 +123,8 @@
 
 			#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
 			float4 position = positionBuffer[unity_InstanceID];
+			o.variant = frac(hash(position)) + _GrassColorThreshold;
+			o.variant = saturate(o.variant);
 			rotateRandom(v, position);
 			updateStamp(v, position);
 			updateWind(v, position);
@@ -126,7 +135,7 @@
 		{
             fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
 
-            o.Albedo = c.rgb;
+            o.Albedo = c.rgb * IN.variant;
 			o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
 
 			fixed4 metallicCol = tex2D(_MetallicTex, IN.uv_MainTex);
