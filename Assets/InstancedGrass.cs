@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 
 public class InstancedGrass : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class InstancedGrass : MonoBehaviour
         }
     }
 
+    public Transform groundTransform;
     public int grassCount;
     public float grassRange;
     public GrassData[] grassDatas;
@@ -34,6 +36,7 @@ public class InstancedGrass : MonoBehaviour
         DrawInstancedGrass();
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            UpdateGroundScale();
             UpdateGrassDatas();
         }
     }
@@ -45,16 +48,21 @@ public class InstancedGrass : MonoBehaviour
             return;
         }
 
-        Graphics.DrawMeshInstancedIndirect(grassMesh, subMeshIndex, grassMaterial, m_drawBounds, m_argsBuffer, 0, m_materialPropertyBlock, UnityEngine.Rendering.ShadowCastingMode.On, true);
+        Graphics.DrawMeshInstancedIndirect(grassMesh, subMeshIndex, grassMaterial, m_drawBounds, m_argsBuffer, 0, m_materialPropertyBlock, ShadowCastingMode.On, true);
+    }
+
+    private void UpdateGroundScale()
+    {
+        groundTransform.localScale = Vector3.one * grassRange / 5;
     }
 
     private void UpdateGrassDatas()
     {
-        m_drawBounds = new Bounds(Vector3.zero, new Vector3(grassRange, grassRange, grassRange));
+        m_drawBounds = new Bounds(Vector3.zero, Vector3.one * grassRange * 2);
         grassDatas = new GrassData[grassCount];
         for(int i = 0; i < grassCount; i++)
         {
-            grassDatas[i] = new GrassData(new Vector4(Random.Range(-grassRange, grassRange), 0, Random.Range(-grassRange, grassRange), 1));
+            grassDatas[i] = new GrassData(new Vector4(Random.Range(-grassRange, grassRange), 0, Random.Range(-grassRange, grassRange), Random.Range(0.5f, 1.0f)));
         }
 
         UpdateComputeBuffer();

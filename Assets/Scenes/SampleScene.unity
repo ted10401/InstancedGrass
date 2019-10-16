@@ -305,7 +305,6 @@ GameObject:
   - component: {fileID: 1556365397}
   - component: {fileID: 1556365396}
   - component: {fileID: 1556365395}
-  - component: {fileID: 1556365394}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -313,20 +312,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!64 &1556365394
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1556365393}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1556365395
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -335,10 +320,10 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1556365393}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
+  m_DynamicOccludee: 0
+  m_MotionVectors: 2
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 1
@@ -381,7 +366,7 @@ Transform:
   m_GameObject: {fileID: 1556365393}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
@@ -415,10 +400,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd880a79e4ab843409ec311b34ff3a0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundTransform: {fileID: 1556365397}
   grassCount: 100000
   grassRange: 25
   grassMesh: {fileID: 4300000, guid: 834fae409915c5847ad0793f3e2b0673, type: 3}
-  grassMaterial: {fileID: 2100000, guid: 0ecd640b4e3b3c840ba9c1e9f6ed86a7, type: 2}
+  grassMaterial: {fileID: 2100000, guid: a3c3a0bf7d1751f43b0c9f8a167da078, type: 2}
   subMeshIndex: 0
 --- !u!4 &1862942733
 Transform:
@@ -521,9 +507,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50770aecd60857e4cbc3e1b3ea272fe3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
-  moveLimit: 25
-  grassMaterial: {fileID: 2100000, guid: 0ecd640b4e3b3c840ba9c1e9f6ed86a7, type: 2}
+  moveSpeed: 5
+  instancedGrass: {fileID: 1862942732}
 --- !u!4 &4440184188750856716 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6275384732459439803, guid: 6d3b594a4e50ab84199bea7e06cb568f,

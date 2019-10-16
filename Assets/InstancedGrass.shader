@@ -1,4 +1,4 @@
-﻿Shader "Instanced/InstancedGrass" {
+﻿Shader "Instanced/Grass" {
     Properties {
 		_Color ("Color", Color) = (0,1,0,1)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
@@ -24,7 +24,6 @@
     }
     SubShader {
         Tags { "RenderType"="Opaque" }
-        LOD 200
         Cull Off
 
         CGPROGRAM
@@ -63,13 +62,6 @@
         StructuredBuffer<float4> positionBuffer;
 		#endif
 
-        void rotate2D(inout float2 v, float r)
-        {
-            float s, c;
-            sincos(r, s, c);
-            v = float2(v.x * c - v.y * s, v.x * s + v.y * c);
-        }
-
         void setup()
         {
 			#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
@@ -86,29 +78,47 @@
 			#endif
         }
 
-		float GetWindStrength(float2 position, float height)
+		void rotate2D(inout float2 v, float r)
 		{
-            float windStrength = tex2Dlod(_WindTex, float4(position / _WindSize + float2(_Time.x * _WindSpeed + height * 0.01, 0), 0, 0)).r;
-            return (windStrength - 0.5) * height * _WindStrength;
-        }
+			float s, c;
+			sincos(r, s, c);
+			v = float2(v.x * c - v.y * s, v.x * s + v.y * c);
+		}
 
-		void vert(inout appdata_full v, out Input o)
+		void rotateRandom(inout appdata_full v, float4 position)
 		{
-			UNITY_INITIALIZE_OUTPUT(Input,o);
-            #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
-            float4 data = positionBuffer[unity_InstanceID];
+			float rotation = position.x + position.y * 10 + position.z * 100 + position.w * 1000;
+			rotate2D(v.vertex.xz, rotation);
+		}
 
-			float3 worldPos = data.xyz;
+		void updateStamp(inout appdata_full v, float4 position)
+		{
+			float3 worldPos = position.xyz;
 			float dist = distance(_CharacterPosition, worldPos);
 			float3 stampStrength = 1 - saturate(dist / _StampRadius);
 			float3 stampDir = worldPos - _CharacterPosition;
 			stampDir = normalize(stampDir) * stampStrength * _StampStrength * v.vertex.y;
 			v.vertex.xz += stampDir.xz;
+		}
 
-			float windStrength = GetWindStrength(data.xz, v.vertex.y);
-            v.vertex.x += windStrength;   
-            v.vertex.y += windStrength * _GrassCurve;
+		void updateWind(inout appdata_full v, float4 position)
+		{
+			float windStrength = tex2Dlod(_WindTex, float4(position.xz / _WindSize + float2(_Time.x * _WindSpeed + v.vertex.y * 0.01, 0), 0, 0)).r;
+			windStrength -= 0.5;
+			windStrength *= v.vertex.y * _WindStrength;
 
+			v.vertex.xy += float2(windStrength, windStrength * _GrassCurve);
+		}
+		
+		void vert(inout appdata_full v, out Input o)
+		{
+			UNITY_INITIALIZE_OUTPUT(Input,o);
+
+			#ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
+			float4 position = positionBuffer[unity_InstanceID];
+			rotateRandom(v, position);
+			updateStamp(v, position);
+			updateWind(v, position);
 			#endif
 		}
 
