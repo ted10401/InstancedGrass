@@ -404,7 +404,7 @@ MonoBehaviour:
   grassCount: 100000
   grassRange: 25
   grassMesh: {fileID: 4300000, guid: 834fae409915c5847ad0793f3e2b0673, type: 3}
-  grassMaterial: {fileID: 2100000, guid: a3c3a0bf7d1751f43b0c9f8a167da078, type: 2}
+  grassMaterial: {fileID: 2100000, guid: 0ecd640b4e3b3c840ba9c1e9f6ed86a7, type: 2}
   subMeshIndex: 0
 --- !u!4 &1862942733
 Transform:
